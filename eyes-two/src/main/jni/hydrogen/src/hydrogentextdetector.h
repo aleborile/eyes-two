@@ -61,6 +61,7 @@ public:
     l_int32 cluster_width_spacing;
     l_float32 cluster_shared_edge;
     l_float32 cluster_h_ratio;
+    l_int32 cluster_min_height;
 
     // Finalized cluster filter
     l_int32 cluster_min_blobs;
@@ -94,6 +95,7 @@ public:
           cluster_width_spacing(2),
           cluster_shared_edge(0.5),
           cluster_h_ratio(1.0),
+          cluster_min_height(5),
           cluster_min_blobs(5),
           cluster_min_aspect(2),
           cluster_min_fdr(2.5),

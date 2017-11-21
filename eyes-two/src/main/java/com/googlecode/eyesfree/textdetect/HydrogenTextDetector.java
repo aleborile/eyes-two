@@ -230,7 +230,7 @@ public class HydrogenTextDetector {
             cluster_width_spacing = 2;
             cluster_shared_edge = 0.5f;
             cluster_h_ratio = 1.0f;
-            cluster_min_height = 15;
+            cluster_min_height = 5;
 
             // Finalized cluster filter
             cluster_min_blobs = 5;
