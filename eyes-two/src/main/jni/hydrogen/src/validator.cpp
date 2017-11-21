@@ -357,7 +357,7 @@ bool ValidateCluster(PIX *pix8, PIXA *pixa, BOX *box, l_float32 *pconf,
   l_int32 count = pixaGetCount(pixa);
   l_float32 fdr = ComputeFDR(pix8);
 
-  if (box->h < 15)
+  if (box->h < params.cluster_min_height)
     return false;
 
   if (aspect < params.cluster_min_aspect)

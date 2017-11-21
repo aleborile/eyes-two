@@ -17,7 +17,7 @@
 #include "common.h"
 #include "hydrogentextdetector.h"
 
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 #ifdef __cplusplus
 extern "C" {
@@ -127,6 +127,8 @@ void Java_com_googlecode_eyesfree_textdetect_HydrogenTextDetector_nativeSetParam
   myParams->cluster_min_fdr = getFloatField(env, paramClass, params, "cluster_min_fdr");
   myParams->cluster_min_edge = getIntField(env, paramClass, params, "cluster_min_edge");
   myParams->cluster_min_edge_avg = getIntField(env, paramClass, params, "cluster_min_edge_avg");
+  myParams->cluster_min_height = getIntField(env, paramClass, params, "cluster_min_height");
+
 }
 
 jlong Java_com_googlecode_eyesfree_textdetect_HydrogenTextDetector_nativeGetTextAreas(
