@@ -3,8 +3,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 apply plugin: 'com.android.library'
 apply plugin: "maven-publish"
 
-def packageName = 'it.bluereply.android'
-def artifactVersion = '0.9'
+
+group = 'com.googlecode.eyesfree'
+version = '0.9.4'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -17,7 +18,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 9
         versionCode 1
-        versionName artifactVersion
+        versionName version
     }
 
     sourceSets {

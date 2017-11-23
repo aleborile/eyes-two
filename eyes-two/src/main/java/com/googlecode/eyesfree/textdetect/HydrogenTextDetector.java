@@ -17,10 +17,15 @@
 package com.googlecode.eyesfree.textdetect;
 
 import android.os.Environment;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.Pixa;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 /**
  * @author alanv@google.com (Alan Viverette)
@@ -67,6 +72,10 @@ public class HydrogenTextDetector {
 
     public Parameters getParameters() {
         return mParams;
+    }
+
+    public static Parameters getNewParameters(){
+        return new Parameters();
     }
 
     public Pixa getTextAreas() {
@@ -125,7 +134,8 @@ public class HydrogenTextDetector {
     // * PUBLIC CLASSES *
     // ******************
 
-    public class Parameters {
+    public static class Parameters implements Parcelable {
+
         public boolean debug;
 
         public String out_dir;
@@ -240,6 +250,59 @@ public class HydrogenTextDetector {
             cluster_min_edge_avg = 1;
         }
 
+        /*
+        *   Clone from other instance
+        * */
+        public Parameters(Parameters toClone) {
+            debug = toClone.debug;
+            out_dir = toClone.out_dir;
+
+            // Edge-based thresholding
+            edge_tile_x = toClone.edge_tile_x;
+            edge_tile_y = toClone. edge_tile_y;
+            edge_thresh = toClone.edge_thresh;
+            edge_avg_thresh = toClone.edge_avg_thresh;
+
+            // Skew angle correction
+            skew_enabled = toClone.skew_enabled = true;
+            skew_min_angle = toClone.skew_min_angle;
+            skew_sweep_range = toClone.skew_sweep_range;
+            skew_sweep_delta = toClone.skew_sweep_delta;
+            skew_sweep_reduction = toClone.skew_sweep_reduction;
+            skew_search_reduction = toClone.skew_search_reduction;
+            skew_search_min_delta = toClone.skew_search_min_delta;
+
+            // Singleton filter
+            single_min_aspect = toClone.single_min_aspect;
+            single_max_aspect = toClone.single_max_aspect;
+            single_min_area = toClone.single_min_area;
+            single_min_density = toClone.single_min_density;
+
+            // Quick pair filter
+            pair_h_ratio = toClone.pair_h_ratio;
+            pair_d_ratio = toClone.pair_d_ratio;
+            pair_h_dist_ratio = toClone.pair_h_dist_ratio;
+            pair_v_dist_ratio = toClone.pair_v_dist_ratio;
+            pair_h_shared = toClone.pair_h_shared;
+
+            // Cluster pair filter
+            cluster_width_spacing = toClone.cluster_width_spacing;
+            cluster_shared_edge = toClone.cluster_shared_edge;
+            cluster_h_ratio = toClone.cluster_h_ratio;
+            cluster_min_height = toClone.cluster_min_height;
+
+            // Finalized cluster filter
+            cluster_min_blobs = toClone.cluster_min_blobs;
+            cluster_min_aspect = toClone.cluster_min_aspect;
+            cluster_min_fdr = toClone.cluster_min_fdr;
+            cluster_min_edge = toClone.cluster_min_edge;
+            cluster_min_edge_avg = toClone.cluster_min_edge_avg;
+        }
+
+        private Parameters(Parcel src) {
+            readFromParcel(src);
+        }
+
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("Parameters:")
@@ -282,6 +345,170 @@ public class HydrogenTextDetector {
 
             return sb.toString();
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            boolean[] bA = new boolean[1];
+            bA[0] = debug;
+            dest.writeBooleanArray(bA);
+            dest.writeString(out_dir);
+
+            // Edge-based thresholding
+            dest.writeInt(edge_tile_x);
+            dest.writeInt(edge_tile_y);
+            dest.writeInt(edge_thresh);
+            dest.writeInt(edge_avg_thresh);
+
+            // Skew angle correction
+            boolean[] sA = new boolean[1];
+            sA[0] = skew_enabled;
+            dest.writeBooleanArray(sA);
+            dest.writeFloat(skew_min_angle);
+            dest.writeFloat(skew_sweep_range);
+            dest.writeFloat(skew_sweep_delta);
+            dest.writeInt(skew_sweep_reduction);
+            dest.writeInt(skew_search_reduction);
+            dest.writeFloat(skew_search_min_delta);
+
+            // Singleton filter
+            dest.writeFloat(single_min_aspect);
+            dest.writeFloat(single_max_aspect);
+            dest.writeInt(single_min_area);
+            dest.writeFloat(single_min_density);
+
+            // Quick pair filter
+            dest.writeFloat(pair_h_ratio);
+            dest.writeFloat(pair_d_ratio);
+            dest.writeFloat(pair_h_dist_ratio);
+            dest.writeFloat(pair_v_dist_ratio);
+            dest.writeFloat(pair_h_shared);
+
+            // Cluster pair filter
+            dest.writeInt(cluster_width_spacing);
+            dest.writeFloat(cluster_shared_edge);
+            dest.writeFloat(cluster_h_ratio);
+            dest.writeInt(cluster_min_height);
+
+            // Finalized cluster filter
+            dest.writeInt(cluster_min_blobs);
+            dest.writeFloat(cluster_min_aspect);
+            dest.writeFloat(cluster_min_fdr);
+            dest.writeInt(cluster_min_edge);
+            dest.writeInt(cluster_min_edge_avg);
+//            Field[] fields = HydrogenTextDetector.Parameters.class.getDeclaredFields();
+//            for(Field f : fields){
+//                try {
+//                    Type t = f.getGenericType();
+//                    if(t.equals(boolean.class)){
+//                        boolean[] bA = new boolean[0];
+//                        bA[0] = ((Boolean)f.get(this));
+//                        dest.writeBooleanArray(bA);
+//                    }else if(t.equals(int.class)){
+//                        dest.writeInt((int)f.get(this));
+//                    }else if(t.equals(float.class)){
+//                        dest.writeFloat((float)f.get(this));
+//                    }else if(t.equals(String.class)){
+//                        dest.writeString((String)f.get(this));
+//                    }else{
+//                        Log.w(TAG, "Setting params exception " + f.getName());
+//                    }
+//                } catch (IllegalAccessException e) {
+//                    e.printStackTrace();
+//                } catch (IllegalArgumentException iae){
+//                    iae.printStackTrace();
+//                }
+//            }
+        }
+
+        private void readFromParcel(Parcel src) {
+            boolean[] dA = new boolean[1];
+            src.readBooleanArray(dA);
+            debug = dA[0];
+            out_dir = src.readString();
+
+            // Edge-based thresholding
+            edge_tile_x = src.readInt();
+            edge_tile_y = src.readInt();
+            edge_thresh = src.readInt();
+            edge_avg_thresh = src.readInt();
+
+            // Skew angle correction
+            boolean[] sA = new boolean[1];
+            src.readBooleanArray(sA);
+            skew_enabled = sA[0];
+            skew_min_angle = src.readFloat();
+            skew_sweep_range = src.readFloat();
+            skew_sweep_delta = src.readFloat();
+            skew_sweep_reduction = src.readInt();
+            skew_search_reduction = src.readInt();
+            skew_search_min_delta = src.readFloat();
+
+            // Singleton filter
+            single_min_aspect = src.readFloat();
+            single_max_aspect = src.readFloat();
+            single_min_area = src.readInt();
+            single_min_density = src.readFloat();
+
+            // Quick pair filter
+            pair_h_ratio = src.readFloat();
+            pair_d_ratio = src.readFloat();
+            pair_h_dist_ratio = src.readFloat();
+            pair_v_dist_ratio = src.readFloat();
+            pair_h_shared = src.readFloat();
+
+            // Cluster pair filter
+            cluster_width_spacing = src.readInt();
+            cluster_shared_edge = src.readFloat();
+            cluster_h_ratio = src.readFloat();
+            cluster_min_height = src.readInt();
+
+            // Finalized cluster filter
+            cluster_min_blobs = src.readInt();
+            cluster_min_aspect = src.readInt();
+            cluster_min_fdr = src.readFloat();
+            cluster_min_edge = src.readInt();
+            cluster_min_edge_avg = src.readInt();
+//            Field[] fields = HydrogenTextDetector.Parameters.class.getDeclaredFields();
+//            for(Field f : fields){
+//                try {
+//                    Type t = f.getGenericType();
+//                    if(t.equals(boolean.class)){
+//                        boolean[] bA = new boolean[0];
+//                        bA[0] = ((Boolean)f.get(this));
+//                        dest.writeBooleanArray(bA);
+//                    }else if(t.equals(int.class)){
+//                        dest.writeInt((int)f.get(this));
+//                    }else if(t.equals(float.class)){
+//                        dest.writeFloat((float)f.get(this));
+//                    }else if(t.equals(String.class)){
+//                        dest.writeString((String)f.get(this));
+//                    }else{
+//                        Log.w(TAG, "Setting params exception " + f.getName());
+//                    }
+//                } catch (IllegalAccessException e) {
+//                    e.printStackTrace();
+//                } catch (IllegalArgumentException iae){
+//                    iae.printStackTrace();
+//                }
+//            }
+        }
+
+        public static final Creator<Parameters> CREATOR = new Creator<Parameters>() {
+            @Override
+            public Parameters createFromParcel(Parcel in) {
+                return new Parameters(in);
+            }
+
+            @Override
+            public Parameters[] newArray(int size) {
+                return new Parameters[size];
+            }
+        };
     }
 
     // ******************
